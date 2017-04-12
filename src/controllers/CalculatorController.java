@@ -9,105 +9,96 @@ import javafx.scene.control.TextField;
 public class CalculatorController {
     @FXML private TextField output;
 
-    //private String oldOutput;
-    //private String currentDigit;
-    private String currentOperator;
-    private double result;
-    private double currentValue;
-
-    private boolean isResultEmpty;
-    private boolean isOperatorEmpty;
-    private boolean isOutput;
-
-    private final int displayLimit;
-    private int currentLimit;
+    private boolean clear;
+    private boolean isSeparator;
+    private boolean isNegate;
 
     public CalculatorController() {
-        result = 0;
-        isResultEmpty = true;
-        isOperatorEmpty = true;
-        isOutput = false;
-        displayLimit = 15;
-        currentLimit = 0;
+        clear = true;
+        isSeparator = false;
+        isNegate = false;
     }
 
     @FXML
     public void handleDigit(ActionEvent event) {
-        if(!isOperatorEmpty) {
+        if(clear) {
             output.setText("");
-            //isOperatorEmpty = true;
-            //System.out.println(isOperatorEmpty);
+            clear = false;
         }
-        if(currentLimit < displayLimit) {
-            String oldOutput = output.getText();
-            String currentDigit = ((Button) event.getSource()).getText();
-            output.setText(oldOutput + currentDigit);
-            isOutput = true;
-            currentLimit++;
-            System.out.println(currentLimit);
-        }
+        String digit = ((Button) event.getSource()).getText();
+        updateOutput(digit);
     }
 
     @FXML
     public void handleOperator(ActionEvent event) {
-        if(isOutput) {
-            currentValue = Double.parseDouble(output.getText());
 
-            if (!isOperatorEmpty) {
-                calculate();
-                output.setText("" + result);
-            }
-
-            if (isResultEmpty) {
-                result = currentValue;
-                isResultEmpty = false;
-            }
-            isOperatorEmpty = false;
-            currentOperator = ((Button) event.getSource()).getText();
-        }
-        currentLimit = 0;
-        isOutput = false;
     }
 
     @FXML
     public void handleEquals() {
-        if(!isOperatorEmpty) {
-            currentValue = Double.parseDouble(output.getText());
-            calculate();
-            output.setText("" + result);
-            isOperatorEmpty = true;
+
+    }
+
+    @FXML
+    public void handleZero() {
+        String text = output.getText();
+        if(!text.equals("0")) {
+            updateOutput("0");
+        }
+    }
+
+    @FXML
+    public void handleSeparator() {
+        if(!isSeparator)
+            updateOutput(".");
+        isSeparator = true;
+        clear = false;
+    }
+
+    @FXML
+    public void handleUndo() {
+        String outputText = output.getText();
+        if(outputText.length() == 1) {
+            output.setText("0");
+            clear = true;
+        }
+        else {
+            if(outputText.endsWith("."))
+                isSeparator = false;
+            outputText = outputText.substring(0, outputText.length() - 1);
+            output.setText(outputText);
+        }
+
+    }
+
+    @FXML
+    public void handleNegate() {
+        String text = output.getText();
+        if(!isNegate) {
+            if (!text.equals("0") && !text.equals("0.")) {
+                output.setText("-" + text);
+                isNegate = true;
+            }
+        }
+        else {
+            output.setText(text.substring(1));
+            isNegate = false;
         }
     }
 
     @FXML
     public void handleReset() {
-        result = 0;
-        currentLimit = 0;
-        isResultEmpty = true;
-        isOperatorEmpty = true;
-        isOutput = false;
-        output.clear();
+        output.setText("0");
+        clear = true;
+        isSeparator = false;
+        isNegate = false;
     }
 
 
-    private void calculate() {
-        switch(currentOperator) {
-            case "+": {
-                result += currentValue;
-                break;
-            }
-            case "-": {
-                result -= currentValue;
-                break;
-            }
-            case "*": {
-                result *= currentValue;
-                break;
-            }
-            case "/": {
-                result /= currentValue;
-                break;
-            }
-        }
+    public void updateOutput(String text) {
+        String oldOutput = output.getText();
+        String newOutput = oldOutput + text;
+        output.setText(newOutput);
     }
+
 }
