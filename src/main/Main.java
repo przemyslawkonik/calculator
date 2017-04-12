@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class Main extends Application {
 
@@ -14,7 +15,12 @@ public class Main extends Application {
         primaryStage.setTitle("Calculator");
         primaryStage.setScene(new Scene(root));
         primaryStage.setResizable(false);
+        //primaryStage.initStyle(StageStyle.TRANSPARENT);
+        //primaryStage.initStyle(StageStyle.UNDECORATED);
+        primaryStage.initStyle(StageStyle.UTILITY);
+        //primaryStage.initStyle(StageStyle.DECORATED);
         primaryStage.show();
+
     }
 
 
