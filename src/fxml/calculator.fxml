@@ -27,7 +27,7 @@
           <RowConstraints minHeight="0.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <TextField fx:id="output" alignment="TOP_RIGHT" disable="true" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" nodeOrientation="LEFT_TO_RIGHT" text="0" GridPane.columnSpan="2147483647" GridPane.rowSpan="2">
+            <TextField fx:id="display" alignment="TOP_RIGHT" disable="true" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" nodeOrientation="LEFT_TO_RIGHT" text="0" GridPane.columnSpan="2147483647" GridPane.rowSpan="2">
                <font>
                   <Font size="18.0" />
                </font>

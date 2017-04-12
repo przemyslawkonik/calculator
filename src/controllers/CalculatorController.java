@@ -7,197 +7,170 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 
 public class CalculatorController {
-    @FXML private TextField output;
-    @FXML private Button digit1;
+    @FXML private TextField display;
 
-    private boolean clear;
-    private boolean isSeparator;
-    private boolean isNegate;
-    private boolean isOperator;
-    private boolean isResult;
-    private boolean isEqual;
-
+    private final int limit;
+    private int current_limit;
+    private String operator;
     private double result;
     private double value;
-    private String operator;
-    private final int limit;
-    private int currentLimit;
+    private boolean isReset;
 
     public CalculatorController() {
-        clear = true;
-        isSeparator = false;
-        isNegate = false;
-        isOperator = false;
-        isResult = false;
-        isEqual = false;
         limit = 15;
-        currentLimit = 0;
+        current_limit = 0;
+        isReset = false;
     }
 
     @FXML
     public void handleDigit(ActionEvent event) {
-        if(isEqual) {
-            output.setText("");
-            clear = false;
-            isSeparator = false;
-            isNegate = false;
-            isOperator = false;
-            isResult = false;
-            isEqual = false;
-            currentLimit = 0;
-
+        if(!isReset)
+            resetDisplay();
+        String text = ((Button) event.getSource()).getText();
+        if(current_limit == 0) {
+            setOutput(text);
+            current_limit++;
         }
-        else if(clear) {
-            output.setText("");
-            clear = false;
-            isSeparator = false;
-            currentLimit = 0;
-        }
-        if(currentLimit < limit) {
-            String digit = ((Button) event.getSource()).getText();
-            updateOutput(digit);
-            currentLimit++;
+        else if(current_limit < limit) {
+            updateOutput(text);
+            current_limit++;
         }
     }
 
     @FXML
     public void handleOperator(ActionEvent event) {
-        if(!isOperator && !isResult) {
-            value = Double.parseDouble(output.getText());
-            if(isNegate)
-                isNegate = false;
-            result = value;
+        if(!isOperator()) {
+            result = Double.parseDouble(display.getText());
             operator = ((Button) event.getSource()).getText();
-            isResult = true;
-            isOperator = true;
-            clear = true;
-        }
-        else if(isOperator && clear) {
+            isReset = false;
+        } else if(isOperator()) {
+            value = Double.parseDouble(display.getText());
+            calculate(value, operator);
+            display.setText(""+result);
             operator = ((Button) event.getSource()).getText();
-        }
-        else if(isOperator && !clear) {
-            value = Double.parseDouble(output.getText());
-            if(isNegate)
-                isNegate = false;
-            calculate();
-            operator = ((Button) event.getSource()).getText();
-            output.setText(""+result);
-            clear = true;
+            isReset = false;
         }
     }
 
     @FXML
     public void handleEquals() {
-        if(isOperator && !clear) {
-            value = Double.parseDouble(output.getText());
-            calculate();
-            output.setText(""+result);
-            clear = true;
-            isEqual = true;
-            //isOperator = false;
+        if(isOperator()) {
+            value = Double.parseDouble(display.getText());
+            calculate(value, operator);
+            display.setText(""+result);
+            operator = null;
+            isReset = false;
         }
     }
 
     @FXML
-    public void handleZero() {
-        if(isEqual) {
-            output.setText("");
-            clear = false;
-            isSeparator = false;
-            isNegate = false;
-            isOperator = false;
-            isResult = false;
-            isEqual = false;
-            currentLimit = 0;
-
-        }
-        String text = output.getText();
-        if(!text.equals("0") && currentLimit < limit) {
-            updateOutput("0");
-            currentLimit++;
+    public void handleZero(ActionEvent event) {
+        if(!isReset)
+            resetDisplay();
+        String text = ((Button) event.getSource()).getText();
+        if(current_limit > 0 && current_limit < limit) {
+            updateOutput(text);
+            current_limit++;
         }
     }
 
     @FXML
-    public void handleSeparator() {
-        if(isEqual) {
-            output.setText("");
-            clear = false;
-            isSeparator = false;
-            isNegate = false;
-            isOperator = false;
-            isResult = false;
-            isEqual = false;
-            currentLimit = 0;
-
-        }
-        if(!isSeparator && currentLimit < limit) {
+    public void handleSeparator(ActionEvent event) {
+        if(!isReset)
+            resetDisplay();
+        String text = ((Button) event.getSource()).getText();
+        if(current_limit == 0) {
+            //setOutput("0"+text);
+            //current_limit = 2;
             updateOutput(".");
-            isSeparator = true;
-            clear = false;
-            currentLimit++;
+            current_limit++;
+        }
+        else if(current_limit < limit && !isSeparator()) {
+            updateOutput(text);
+            current_limit++;
         }
     }
 
     @FXML
     public void handleUndo() {
-        String outputText = output.getText();
-        if(outputText.length() == 1) {
-            output.setText("0");
-            clear = true;
-            currentLimit = 0;
-        }
-        else if(outputText.length() == 2 && isNegate) {
-            output.setText("0");
-            clear = true;
-            currentLimit = 0;
-        }
-        else {
-            if(outputText.endsWith("."))
-                isSeparator = false;
-            outputText = outputText.substring(0, outputText.length() - 1);
-            output.setText(outputText);
-            currentLimit--;
-        }
-
+        if(!isReset)
+            resetDisplay();
+        //if(!isOperator()) {
+            if (current_limit > 0) {
+                String output = display.getText();
+                output = output.substring(0, output.length() - 1);
+                current_limit--;
+                if (current_limit == 0)
+                    setOutput("0");
+                else
+                    setOutput(output);
+            }
+        //}
     }
 
     @FXML
     public void handleNegate() {
-        String text = output.getText();
-        if(!isNegate) {
-            if (!text.equals("0") && !text.equals("0.")) {
-                output.setText("-" + text);
-                isNegate = true;
-            }
-        }
-        else {
-            output.setText(text.substring(1));
-            isNegate = false;
+        if(!isOperator()) {
+            //resetDisplay();
+            String output = display.getText();
+            if (current_limit > 0 && !isNegate())
+                setOutput("-" + output);
+            else if (current_limit > 0 && isNegate())
+                setOutput(output.substring(1));
         }
     }
 
     @FXML
     public void handleReset() {
-        output.setText("0");
-        clear = true;
-        isSeparator = false;
-        isNegate = false;
-        isOperator = false;
-        isResult = false;
-        isEqual = false;
-        currentLimit = 0;
+        display.setText("0");
+        current_limit = 0;
+        operator = null;
     }
 
 
-    public void updateOutput(String text) {
-        String oldOutput = output.getText();
-        String newOutput = oldOutput + text;
-        output.setText(newOutput);
+    ///////////////////////////////////////////////////////////////////////////////
+    private void updateOutput(String update) {
+        String oldOutput = display.getText();
+        String newOutput = oldOutput + update;
+        display.setText(newOutput);
     }
 
-    public void calculate() {
-        switch(operator) {
+    private void setOutput(String output) {
+        display.setText(output);
+    }
+
+    private boolean isSeparator() {
+        String output = display.getText();
+        if(output.contains("."))
+            return true;
+        else
+            return false;
+    }
+
+    private boolean isNegate() {
+        String output = display.getText();
+        if(output.contains("-"))
+            return true;
+        else
+            return false;
+    }
+
+    private boolean isOperator() {
+        if(operator != null)
+            return true;
+        else
+            return false;
+    }
+
+    private void resetDisplay() {
+        current_limit = 0;
+        display.setText("0");
+        isReset = true;
+        //operator = null;
+    }
+
+    private void calculate(double value, String operator) {
+        switch (operator) {
             case "+": {
                 result += value;
                 break;
@@ -215,17 +188,6 @@ public class CalculatorController {
                 break;
             }
         }
-    }
-
-    private float round(double f, int places)
-
-    {  float temp = (float)(f*(Math.pow(10, places)));
-
-        temp = (Math.round(temp));
-
-        temp = temp/(int)(Math.pow(10, places));
-
-        return temp;
     }
 
 }
