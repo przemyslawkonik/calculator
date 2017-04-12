@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.text.Font;
 
 public class CalculatorController {
     @FXML private TextField display;
@@ -45,8 +46,12 @@ public class CalculatorController {
             isReset = false;
         } else if(isOperator()) {
             value = Double.parseDouble(display.getText());
-            calculate(value, operator);
-            display.setText(""+result);
+            try {
+                calculate(value, operator);
+                display.setText("" + result);
+            }catch(IllegalArgumentException e) {
+                display.setText("can't divide by 0");
+            }
             operator = ((Button) event.getSource()).getText();
             isReset = false;
         }
@@ -56,8 +61,12 @@ public class CalculatorController {
     public void handleEquals() {
         if(isOperator()) {
             value = Double.parseDouble(display.getText());
-            calculate(value, operator);
-            display.setText(""+result);
+            try {
+                calculate(value, operator);
+                display.setText("" + result);
+            }catch(IllegalArgumentException e) {
+                display.setText("can't divide by 0");
+            }
             operator = null;
             isReset = false;
         }
@@ -170,6 +179,7 @@ public class CalculatorController {
     }
 
     private void calculate(double value, String operator) {
+        if(value == 0) throw new IllegalArgumentException();
         switch (operator) {
             case "+": {
                 result += value;
