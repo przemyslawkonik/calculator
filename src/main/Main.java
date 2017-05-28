@@ -17,7 +17,7 @@ public class Main extends Application {
         primaryStage.setResizable(false);
         //primaryStage.initStyle(StageStyle.TRANSPARENT);
         //primaryStage.initStyle(StageStyle.UNDECORATED);
-        primaryStage.initStyle(StageStyle.UTILITY);
+        //primaryStage.initStyle(StageStyle.UTILITY);
         //primaryStage.initStyle(StageStyle.DECORATED);
         primaryStage.show();
 
